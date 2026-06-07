@@ -4,6 +4,10 @@ import os
 from config import REPORTS_DIR
 
 def load_documents():
+    """
+    Load all PDF reports from the reports directory as LangChain Document objects.
+    Each page is tagged with its source filename for citation in RAG responses.
+    """
     docs = []
     for filename in os.listdir(REPORTS_DIR):
         if filename.endswith(".pdf"):
@@ -17,6 +21,12 @@ def load_documents():
     return docs
 
 def split_documents(docs):
+    """
+    Split documents into overlapping chunks for embedding and retrieval.
+
+    chunk_size=800   : Balances context richness vs retrieval precision.
+    chunk_overlap=100: Ensures no information is lost at chunk boundaries.
+    """
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=100
