@@ -6,6 +6,55 @@ A live market intelligence dashboard for the German Day-Ahead electricity market
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart TD
+
+    classDef data fill:#0a1929,stroke:#00e5ff,stroke-width:2px,color:#ffffff
+    classDef ai fill:#120a29,stroke:#d500f9,stroke-width:2px,color:#ffffff
+    classDef ui fill:#0a291a,stroke:#00e676,stroke-width:2px,color:#ffffff
+    classDef user fill:#29140a,stroke:#ff9100,stroke-width:2px,color:#ffffff
+
+    subgraph DataLayer ["🔹 Data Layer"]
+        A[("📈 SMARD API")]:::data
+        B[("🌤️ Open-Meteo API")]:::data
+        C[("📄 IEA / ENTSO-E / Ember PDFs")]:::data
+        D["📥 Data Pipeline"]:::data
+    end
+
+    subgraph IntelLayer ["🧠 Intelligence Layer"]
+        D -->|Hourly prices| E{"🧮 Z-Score Detector"}:::ai
+        E -->|Anomaly + Weather| F["🤖 LLM Explainer"]:::ai
+        F -->|Groq Llama 3.1| G["💬 Explanation"]:::ai
+
+        E -->|Price series| H["📉 Backtester"]:::ai
+        H --> I["📊 Sharpe / PnL / Drawdown"]:::ai
+
+        C -->|Chunking + Embeddings| J["🗂️ FAISS Vector Index"]:::ai
+        J -->|Semantic Search| K["🤖 RAG Retriever"]:::ai
+        K -->|Groq Llama 3.1| L["💬 Grounded Answer"]:::ai
+    end
+
+    subgraph ViewLayer ["💻 Presentation Layer"]
+        G --> M["🚀 Streamlit Dashboard"]:::ui
+        I --> M
+        L --> M
+        M -->|Visual Insights| N("👤 Analyst / Trader"):::user
+    end
+
+    A --> D
+    B --> D
+
+    linkStyle default stroke:#ffffff,stroke-width:2px,fill:none
+
+    style DataLayer fill:#161b22,stroke:#004dcf,stroke-width:1px,stroke-dasharray: 5 5,color:#fff
+    style IntelLayer fill:#161b22,stroke:#7c4dff,stroke-width:1px,stroke-dasharray: 5 5,color:#fff
+    style ViewLayer fill:#161b22,stroke:#00bfa5,stroke-width:1px,stroke-dasharray: 5 5,color:#fff
+```
+
+---
+
 ## Overview
 
 This project demonstrates an end-to-end data science workflow applied to European energy markets — from raw market data ingestion to LLM-powered analysis — directly aligned with quantitative trading and data science workflows used in energy trading firms.
@@ -18,7 +67,7 @@ The dashboard covers three core capabilities:
 
 ---
 
-## Architecture
+## Project Structure
 
 ```
 european-power-intelligence/
@@ -142,4 +191,5 @@ All data sources are **free and publicly accessible**:
 
 ---
 
-*Project created by Antonin MORENO - Open Source under MIT License.*
+
+*Project created by Antonin Alex MORENO - Open Source under MIT License.*
